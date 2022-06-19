@@ -1,6 +1,6 @@
 {
   "name": "oa-nodejs-internship-lesson3-express-pt1",
-  "version": "1.0.0-alpha",
+  "version": "1.1.0-alpha",
   "description": "Simple Express REST API",
   "main": "index.js",
   "scripts": {

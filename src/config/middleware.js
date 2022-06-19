@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const helmet = require('helmet');
 const cors = require('cors');
+const ResourceNotFound = require('../errors/ResourceNotFound');
 
 class Middleware {
   static init(app) {
@@ -21,12 +22,39 @@ class Middleware {
   }
 
   static errors(app) {
-    // 404 response (must be very last)
+    // 404 Route response (must be very last as "route")
     app.use((_req, res) => {
       res.status(404).json({
         message: 'Route Not Found.',
       });
     });
+    // 404 Resource response
+    app.use((err, _req, res, next) => {
+      if (err instanceof ResourceNotFound) {
+        res.status(404).json({
+          message: 'Resource Not Found.',
+        });
+      } else {
+        next(err);
+      }
+    });
+    // 500 response
+    app.use((err, _req, res, next) => {
+      console.log('500 response');
+      res.status(500).json({
+        message: err.message,
+        stack: err.stack,
+      });
+      // NOTE: next(err) doesn't cause "Cannot set headers after they are sent to the client"
+      // because there's check in default error handler (?)
+      next(err);
+    });
+    // another error handler
+    app.use((err, _req, _res, next) => {
+      console.log('another error handler');
+      next(err);
+    });
+    // NOTE: default error handler goes "here".
   }
 }
 
