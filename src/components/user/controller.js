@@ -8,13 +8,6 @@ const checkIfResourceFound = (resource) => {
 };
 
 class UserController {
-  /**
-   * @function
-   * @param {express.Request} req
-   * @param {express.Response} res
-   * @param {express.NextFunction} next
-   * @returns {Promise < void >}
-   */
   static async getAll(req, res, next) {
     try {
       const users = await UserService.findAll();

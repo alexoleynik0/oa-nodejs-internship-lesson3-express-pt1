@@ -1,13 +1,6 @@
 const UserModel = require('./model');
 
 class UserService {
-  /**
-   * @exports
-   * @method findAll
-   * @param {}
-   * @summary get list of all users
-   * @returns Promise<UserModel[]>
-   */
   static async findAll() {
     return UserModel.find({});
   }
@@ -25,15 +18,12 @@ class UserService {
   }
 
   static async putOneById(id, userData) {
-    return UserModel.updateById(id, userData);
+    return UserModel.update({ where: { id }, limit: 1 }, userData);
   }
 
   static async patchOneById(id, userData) {
-    const foundUser = await UserModel.find({ where: { id }, limit: 1 });
-    if (foundUser === null) {
-      return Promise.resolve(null);
-    }
-    return UserModel.updateById(id, { ...foundUser, ...userData });
+    const found = await UserModel.find({ where: { id }, limit: 1 });
+    return UserModel.updateOne({}, { ...found, ...userData }, found);
   }
 
   static async removeOneById(id) {
