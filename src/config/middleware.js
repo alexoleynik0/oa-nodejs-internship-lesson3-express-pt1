@@ -3,8 +3,12 @@ const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const helmet = require('helmet');
 const cors = require('cors');
-const ResourceNotFound = require('../errors/ResourceNotFound');
-const ValidationError = require('../errors/ValidationError');
+
+const routeNotFoundErrorResponse = require('../middleware/errors/routeNotFoundErrorResponse');
+const resourceNotFoundErrorResponse = require('../middleware/errors/resourceNotFoundErrorResponse');
+const validationErrorResponse = require('../middleware/errors/validationErrorResponse');
+const dbErrorResponse = require('../middleware/errors/dbErrorResponse');
+const unhandledErrorResponse = require('../middleware/errors/unhandledErrorResponse');
 
 class Middleware {
   static init(app) {
@@ -24,48 +28,15 @@ class Middleware {
 
   static errors(app) {
     // 404 Route response (must be very last as "route")
-    app.use((_req, res) => {
-      res.status(404).json({
-        message: 'Route Not Found.',
-      });
-    });
+    app.use(routeNotFoundErrorResponse);
     // 404 Resource response
-    app.use((err, _req, res, next) => {
-      if (err instanceof ResourceNotFound) {
-        res.status(404).json({
-          message: 'Resource Not Found.',
-        });
-      } else {
-        next(err);
-      }
-    });
+    app.use(resourceNotFoundErrorResponse);
     // 422 Validation response
-    app.use((err, _req, res, next) => {
-      if (err instanceof ValidationError) {
-        res.status(422).json({
-          message: err.message,
-        });
-      } else {
-        next(err);
-      }
-    });
-    // 500 response
-    app.use((err, _req, res, next) => {
-      console.log('500 response');
-      res.status(500).json({
-        message: err.message,
-        stack: err.stack,
-      });
-      // NOTE: next(err) doesn't cause "Cannot set headers after they are sent to the client"
-      // because there's check in default error handler (?)
-      next(err);
-    });
-    // another error handler
-    app.use((err, _req, _res, next) => {
-      console.log('another error handler');
-      next(err);
-    });
-    // NOTE: default error handler goes "here".
+    app.use(validationErrorResponse);
+    // 500 DB errors response
+    app.use(dbErrorResponse);
+    // 500 unhandled response
+    app.use(unhandledErrorResponse);
   }
 }
 
