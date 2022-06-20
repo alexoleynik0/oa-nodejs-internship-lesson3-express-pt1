@@ -77,6 +77,7 @@ class UserController {
   static async remove(req, res, next) {
     try {
       const removedUser = await UserService.removeOneById(req.params.id);
+      checkIfResourceFound(removedUser);
 
       res.status(200).json(removedUser);
     } catch (error) {

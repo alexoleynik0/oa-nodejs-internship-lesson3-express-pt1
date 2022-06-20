@@ -7,6 +7,7 @@ class Router {
     const userRouter = express.Router();
     // simple req.params.id changer {@see http://expressjs.com/en/5x/api.html#app.param}
     userRouter.param('id', (req, res, next, id) => {
+      // NOTE: no need to check `isNaN(req.params.id)` bc only numeric accepted by route regexp.
       req.params.id = parseInt(id, 10);
       next();
     });

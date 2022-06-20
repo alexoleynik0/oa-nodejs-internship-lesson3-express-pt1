@@ -1,5 +1,4 @@
-const USERS_STORE_DEFAULT = [{ id: 1, name: 'Vasyl', email: 'vasyl@test.test' }];
-let usersStore = [...USERS_STORE_DEFAULT];
+const db = require('../../db');
 
 // eslint-disable-next-line arrow-body-style
 const modelFindFilterCb = (model, where) => {
@@ -12,7 +11,7 @@ const modelFindFilterCb = (model, where) => {
 
 class UserModel {
   static async find(options = {}) {
-    let foundUsers = [...usersStore];
+    let foundUsers = [...db.users];
     if (options.where) {
       foundUsers = foundUsers.filter((user) => modelFindFilterCb(user, options.where));
     }
@@ -28,9 +27,10 @@ class UserModel {
   static async create(userData) {
     const newUser = {
       ...userData,
-      id: usersStore.length + 1, // IDEA: better id creation
+      id: db.getNextID('users'),
+      createdAt: db.getCurrentTimestamp(),
     };
-    usersStore = [...usersStore, newUser];
+    db.users = [...db.users, newUser];
     return Promise.resolve(newUser);
   }
 
@@ -39,15 +39,20 @@ class UserModel {
     if (foundUser === null) {
       return Promise.resolve(null);
     }
-    const userDataPrepared = { ...userData, id };
-    usersStore = usersStore.map((user) => (user.id === id ? userDataPrepared : user));
+    const userDataPrepared = {
+      ...userData,
+      id,
+      createdAt: foundUser.createdAt,
+      updatedAt: db.getCurrentTimestamp(),
+    };
+    db.users = db.users.map((user) => (user.id === id ? userDataPrepared : user));
     return Promise.resolve(userDataPrepared);
   }
 
   static async remove(options) {
     const foundUser = await UserModel.find(options);
     if (foundUser !== null) {
-      usersStore = usersStore.filter((user) => user.id !== foundUser.id);
+      db.users = db.users.filter((user) => user.id !== foundUser.id);
     }
     return Promise.resolve(foundUser);
   }
