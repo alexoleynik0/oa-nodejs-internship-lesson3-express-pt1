@@ -31,8 +31,8 @@ class UserController {
 
   static async create(req, res, next) {
     try {
-      // TODO: Joi validation
-      const userData = req.body;
+      // NOTE: validation happens in a middleware
+      const userData = req.bodyValidated;
       const user = await UserService.createOne(userData);
 
       res.status(201).json(user);
@@ -43,8 +43,7 @@ class UserController {
 
   static async put(req, res, next) {
     try {
-      // TODO: Joi validation
-      const userData = req.body;
+      const userData = req.bodyValidated;
       const putUser = await UserService.putOneById(req.params.id, userData);
       checkIfResourceFound(putUser);
 
@@ -56,8 +55,7 @@ class UserController {
 
   static async patch(req, res, next) {
     try {
-      // TODO: Joi validation
-      const userData = req.body;
+      const userData = req.bodyValidated;
       const patchedUser = await UserService.patchOneById(req.params.id, userData);
       checkIfResourceFound(patchedUser);
 

@@ -1,21 +1,44 @@
 // faux db
 
-const users = [{
-  id: 1, name: 'Vasyl', email: 'vasyl@test.test', createdAt: 1655722868839, updatedAt: null,
-}, {
-  id: 2, name: 'Stepan', email: 'stepan@test.test', createdAt: 1655722892493, updatedAt: null,
-}];
-
-const lastIDs = {
-  users: users.at(-1).id,
-};
+// helpers
+module.exports.getCurrentDate = () => (new Date()).toJSON();
+const getPrimaryKeyIndex = (model) => model.indexes.find((index) => index.primaryKey);
 
 // models
+const users = {
+  data: [{
+    id: 1, name: 'Vasyl', email: 'vasyl@test.test', createdAt: '2022-06-20T21:41:03.701Z', updatedAt: null,
+  }, {
+    id: 2, name: 'Stepan', email: 'stepan@test.test', createdAt: '2022-06-20T21:41:03.701Z', updatedAt: null,
+  }],
+  indexes: [
+    {
+      name: 'primaryKey_id',
+      key: 'id',
+      unique: true,
+      primaryKey: true,
+      currentValue: 1,
+      getNextValue() {
+        this.currentValue += 1;
+        return this.currentValue;
+      },
+    },
+    { name: 'email_unique', key: 'email', unique: true },
+  ],
+  getPrimaryKeyNextValue() {
+    const primaryKey = getPrimaryKeyIndex(this);
+    return primaryKey.getNextValue();
+  },
+};
 module.exports.users = users;
 
-// helpers
-module.exports.getNextID = (modelKey) => {
-  lastIDs[modelKey] += 1;
-  return lastIDs[modelKey];
+const models = {
+  users,
 };
-module.exports.getCurrentTimestamp = () => Date.now();
+module.exports.models = models;
+
+// set currentValue for primaryKey indexes
+Object.keys(models).forEach((modelKey) => {
+  const primaryKey = getPrimaryKeyIndex(models[modelKey]);
+  primaryKey.currentValue = models[modelKey].data.at(-1)[primaryKey.key];
+});

@@ -1,5 +1,7 @@
 const express = require('express');
 const UserController = require('../components/user/controller');
+const UserSchemas = require('../components/user/schemas');
+const validation = require('../middleware/validation');
 
 class Router {
   static init(app) {
@@ -13,9 +15,9 @@ class Router {
     });
     userRouter.get('/', UserController.getAll);
     userRouter.get('/:id(\\d+)', UserController.getOne);
-    userRouter.post('/', UserController.create);
-    userRouter.put('/:id(\\d+)', UserController.put);
-    userRouter.patch('/:id(\\d+)', UserController.patch);
+    userRouter.post('/', validation(UserSchemas.userCreateSchema), UserController.create);
+    userRouter.put('/:id(\\d+)', validation(UserSchemas.userPutSchema), UserController.put);
+    userRouter.patch('/:id(\\d+)', validation(UserSchemas.userPatchSchema), UserController.patch);
     userRouter.delete('/:id(\\d+)', UserController.remove);
 
     // v1 routes

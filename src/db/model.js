@@ -10,15 +10,15 @@ const modelFindFilterCb = (model, where) => {
 };
 
 const prepareCreatedModel = (modelKey, createData) => ({
-  createdAt: db.getCurrentTimestamp(),
-  updatedAt: null,
+  createdAt: db.getCurrentDate(),
+  updatedAt: null, // NOTE: usually it sets current to but I don't see the use
   ...createData,
-  id: db.getNextID(modelKey),
+  id: db[modelKey].getPrimaryKeyNextValue(),
 });
 
 const prepareUpdatedModel = (model, updateData) => ({
   createdAt: model.createdAt,
-  updatedAt: db.getCurrentTimestamp(),
+  updatedAt: db.getCurrentDate(),
   ...updateData,
   id: model.id,
 });
@@ -27,7 +27,7 @@ class Model {
   static modelKey = '';
 
   static async find(findOptions = {}) {
-    let foundModels = [...db[this.modelKey]];
+    let foundModels = [...db[this.modelKey].data];
     if (findOptions.where) {
       foundModels = foundModels.filter((model) => modelFindFilterCb(model, findOptions.where));
     }
@@ -41,8 +41,8 @@ class Model {
   }
 
   static async create(createData) {
-    const createdModel = prepareCreatedModel(createData);
-    db[this.modelKey] = [...db[this.modelKey], createdModel];
+    const createdModel = prepareCreatedModel(this.modelKey, createData);
+    db[this.modelKey].data = [...db[this.modelKey].data, createdModel];
     return Promise.resolve(createdModel);
   }
 
@@ -63,7 +63,7 @@ class Model {
       return Promise.resolve(found);
     }
     const updatedModel = prepareUpdatedModel(found, updateData);
-    db[this.modelKey] = db[this.modelKey].map(
+    db[this.modelKey].data = db[this.modelKey].data.map(
       (model) => (model.id === found.id ? updatedModel : model),
     );
     return Promise.resolve(updatedModel);
@@ -77,7 +77,7 @@ class Model {
     const foundArrayIDs = foundArray.map((model) => model.id);
 
     const updatedModels = [];
-    db[this.modelKey] = db[this.modelKey].map(
+    db[this.modelKey].data = db[this.modelKey].data.map(
       (model) => {
         if (foundArrayIDs.indexOf(model.id) === -1) {
           return model;
@@ -106,7 +106,7 @@ class Model {
     if (found === null) {
       return Promise.resolve(found);
     }
-    db[this.modelKey] = db[this.modelKey].filter((model) => model.id !== found.id);
+    db[this.modelKey].data = db[this.modelKey].data.filter((model) => model.id !== found.id);
     return Promise.resolve(found);
   }
 
@@ -117,7 +117,7 @@ class Model {
     }
     const foundArrayIDs = foundArray.map((model) => model.id);
 
-    db[this.modelKey] = db[this.modelKey].filter(
+    db[this.modelKey].data = db[this.modelKey].data.filter(
       (model) => (foundArrayIDs.indexOf(model.id) === -1),
     );
     return Promise.resolve(foundArray);

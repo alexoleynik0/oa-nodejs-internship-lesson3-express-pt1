@@ -4,6 +4,7 @@ const compression = require('compression');
 const helmet = require('helmet');
 const cors = require('cors');
 const ResourceNotFound = require('../errors/ResourceNotFound');
+const ValidationError = require('../errors/ValidationError');
 
 class Middleware {
   static init(app) {
@@ -33,6 +34,16 @@ class Middleware {
       if (err instanceof ResourceNotFound) {
         res.status(404).json({
           message: 'Resource Not Found.',
+        });
+      } else {
+        next(err);
+      }
+    });
+    // 422 Validation response
+    app.use((err, _req, res, next) => {
+      if (err instanceof ValidationError) {
+        res.status(422).json({
+          message: err.message,
         });
       } else {
         next(err);
