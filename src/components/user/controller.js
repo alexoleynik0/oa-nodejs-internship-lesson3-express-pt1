@@ -8,7 +8,7 @@ const checkIfResourceFound = (resource) => {
 };
 
 class UserController {
-  static async getAll(req, res, next) {
+  static async getAll(_req, res, next) {
     try {
       const users = await UserService.findAll();
 
@@ -31,7 +31,7 @@ class UserController {
 
   static async create(req, res, next) {
     try {
-      // NOTE: validation happens in a middleware
+      // NOTE: validation happens in a src/middleware/validation
       const userData = req.bodyValidated;
       const user = await UserService.createOne(userData);
 

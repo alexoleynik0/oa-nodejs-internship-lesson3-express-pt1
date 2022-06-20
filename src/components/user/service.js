@@ -23,6 +23,9 @@ class UserService {
 
   static async patchOneById(id, userData) {
     const found = await UserModel.find({ where: { id }, limit: 1 });
+    if (found === null) {
+      return Promise.resolve(found);
+    }
     return UserModel.updateOne({}, { ...found, ...userData }, found);
   }
 
