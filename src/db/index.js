@@ -2,14 +2,14 @@
 
 // helpers
 module.exports.getCurrentDate = () => (new Date()).toJSON();
-const getPrimaryKeyIndex = (model) => model.indexes.find((index) => index.primaryKey);
+const getPrimaryKeyIndex = (model) => model.indexes.find((modelIndex) => modelIndex.primaryKey);
 
 // models
 const users = {
   data: [{
-    id: 1, name: 'Vasyl', email: 'vasyl@test.test', createdAt: '2022-06-20T21:41:03.701Z', updatedAt: null,
+    id: 1, name: 'Vasyl', email: 'vasyl@test.com', createdAt: '2022-06-20T21:41:03.701Z', updatedAt: null,
   }, {
-    id: 2, name: 'Stepan', email: 'stepan@test.test', createdAt: '2022-06-20T21:41:03.701Z', updatedAt: null,
+    id: 2, name: 'Stepan', email: 'stepan@test.com', createdAt: '2022-06-20T21:41:03.701Z', updatedAt: null,
   }],
   indexes: [
     {
