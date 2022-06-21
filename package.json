@@ -1,7 +1,11 @@
 {
   "name": "oa-nodejs-internship-lesson3-express-pt1",
-  "version": "1.2.1-alpha",
+  "version": "1.2.2-alpha",
   "description": "Simple Express REST API",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexoleynik0/oa-nodejs-internship-lesson3-express-pt1.git"
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
